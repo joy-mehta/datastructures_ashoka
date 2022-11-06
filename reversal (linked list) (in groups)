@@ -1,0 +1,99 @@
+// reversal of a linked list in groups of given size (iteratively)
+#include<stdio.h>
+#include<stdlib.h>
+
+/* Linkedlist nodes */
+struct nodes
+{
+	int data;
+	struct nodes* next;
+};
+
+/* the linked list gets reversed but in groups of size m and gives back the
+pointer to the new HEADS node. */
+struct nodes *reversal (struct nodes *HEADS, int m)
+{
+	if (!HEADS)
+		return NULL;
+
+	struct nodes* current = HEADS;
+	struct nodes* next = NULL;
+	struct nodes* preceding = NULL;
+	int count = 0;
+
+	
+	
+	/*reversal of first m nodes of the linkedslist */
+	while (current != NULL && count < m)
+	{
+		next = current->next;
+		current->next = preceding;
+		preceding = current;
+		current = next;
+		count++;
+	}
+	
+	/* next becomes pointer to (m+1)th node
+	 recall back recursively the list starting from current.
+	And form remaining list as next of first node */
+	if (next != NULL)
+	HEADS->next = reversal(next, m);
+
+	/* preceding is the modified HEADS of the linked list that was inputed */
+	return preceding;
+}
+
+/*  pushing a node */
+void PUSH(struct nodes** HEADS_ref, int new_data)
+{
+	/* assign node */
+	struct nodes* new_node =
+			(struct nodes*) malloc(sizeof(struct nodes));
+
+	/* data input*/
+	new_node->data = new_data;
+
+	/* linking of the new node to the old node */
+	new_node->next = (*HEADS_ref);
+
+	/* shift the HEADS to navigate to the new node */
+	(*HEADS_ref) = new_node;
+}
+
+/* program to print linked list (plist function)*/
+void plist(struct nodes *node)
+{
+	while (node != NULL)
+	{
+		printf("%d ", node->data);
+		node = node->next;
+	}
+}
+
+/* Driver code*/
+int main(void)
+{
+	/* begin with the empty list */
+	struct nodes* HEADS = NULL;
+
+	/* Created Linked list is 4->5->6->7->8->9->10->11->12->13 */
+	PUSH(&HEADS, 13);
+    PUSH(&HEADS, 12);
+	PUSH(&HEADS, 11);
+	PUSH(&HEADS, 10);
+	PUSH(&HEADS, 9);
+	PUSH(&HEADS, 8);
+	PUSH(&HEADS, 7);
+	PUSH(&HEADS, 6);
+	PUSH(&HEADS, 5);
+	PUSH(&HEADS, 4);		
+
+	printf(" Original linked list \n");
+	plist(HEADS);
+	HEADS = reversal(HEADS, 2);
+
+	printf("\n Linked list after reversal \n");
+	plist(HEADS);
+
+	return(0);
+}
