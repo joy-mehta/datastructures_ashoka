@@ -1,0 +1,104 @@
+// Arranging (sorting) linkedlist
+// using insertion sort (by using C)
+#include <stdio.h>
+#include <stdlib.h>
+
+struct nodes {
+	int data;
+	struct nodes* next;
+};
+
+struct nodes* initialpointer = NULL;
+struct nodes* arranged = NULL;
+
+void push(int val)
+{
+	/* assigning nodes */
+	struct nodes* node2
+		= (struct nodes*)malloc(sizeof(struct nodes));
+	node2->data = val;
+	/* the new node are linked to the old list */
+	node2->next = initialpointer;
+	/* move the initialpointer to point to the new nodes */
+	initialpointer = node2;
+}
+
+/*
+* to add a new node in a list- remember that
+* this function expects a pointer to initialpointer_ref since this
+* has the ability to change the initialpointer of the input linked list
+* (similar to push())
+*/
+void insertsort(struct nodes* node2)
+{
+	/* Special case for the initialpointer end */
+	if (arranged == NULL || arranged->data >= node2->data) {
+		node2->next = arranged;
+		arranged = node2;
+	}
+	else {
+		struct nodes* current = arranged;
+		/* the nodes have to be navigated before the point of insertion
+		*/
+		while (current->next != NULL
+			&& current->next->data < node2->data) {
+			current = current->next;
+		}
+		node2->next = current->next;
+		current->next = node2;
+	}
+}
+
+// to arrange a singly linked list
+// using insertion sort
+void insertionsort()
+{
+
+	struct nodes* current = initialpointer;
+
+	// go through the given linked list and insert every
+	// nodes to arranged
+	while (current != NULL) {
+
+		// Store next for next iteration
+		struct nodes* next = current->next;
+
+		// add current in arranged linked list
+		insertsort(current);
+
+		// modify current
+		current = next;
+	}
+	// modify initialpointer to point to arranged linked list
+	initialpointer = arranged;
+}
+
+/*  to print linked list:- */
+void printlist(struct nodes* initialpointer)
+{
+	while (initialpointer != NULL) {
+		printf("%d->", initialpointer->data);
+		initialpointer = initialpointer->next;
+	}
+	printf("NULL");
+}
+
+// Driver program to test above functions
+int main()
+{
+
+	push(15);
+	push(30);
+	push(87);
+	push(1);
+	push(55);
+
+	printf("Unsorted Linked List:\n");
+	printlist(initialpointer);
+	printf("\n");
+
+	insertionsort(initialpointer);
+
+	printf("Sorted Linked List:\n");
+	printlist(initialpointer);
+}
