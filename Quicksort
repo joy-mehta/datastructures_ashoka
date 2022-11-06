@@ -1,0 +1,62 @@
+// Online C compiler to run C program online
+#include <stdio.h>
+void exchange(int *x, int *y)
+{
+  int w = *x;
+  *x = *y;
+  *y = w;
+}
+
+int part(int x[], int start, int end)
+{ 
+  int piv = x[end];
+  int m = (start-1);
+  for (int k = start; k < end; k++)
+  {
+    if (x[k] <= piv)
+    {  
+        m++; 
+        exchange(&x[m], &x[k]);
+    }
+  }
+  exchange(&x[m + 1], &x[end]);
+  return (m + 1);
+}
+    
+void qs(int x[], int start, int end)
+{
+  if (start < end)
+  {
+    int p = part(x, start, end);
+    qs(x, start, p-1);
+    qs(x, p+1, end);
+  }
+}
+
+void printing(int x[], int n)
+{
+  for (int m = 0; m < n; m++)
+  {
+    printf("%d  ", x[m]);
+  }
+  printf("\n");
+}
+
+int main()
+{
+    int s;
+    printf("What is the array length?\n");
+    scanf("%d", &s);
+    int x[s];
+    printf("What are the elements of the array\n");
+    for(int m = 0; m < s; m++)
+    {
+        scanf("%d", &x[m]);
+    }
+    printf("Input array is:\n");
+    printing(x, s);
+    qs(x, 0, s);
+    printf("Sorted array: \n");
+    printing(x, s);
+    return 0;
+}
