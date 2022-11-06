@@ -1,0 +1,68 @@
+// function to reversal a linked list using C (iterative)
+#include <stdio.h>
+#include <stdlib.h>
+
+/* Linked list nodes */
+struct nodes {
+	int data;
+	struct nodes* next;
+};
+
+/* used for reversal of the linkedlists */
+static void reversal(struct nodes** initialpointer_ref)
+{
+	struct nodes* previous = NULL;
+	struct nodes* current = *initialpointer_ref;
+	struct nodes* next = NULL;
+	while (current != NULL) {
+		// remembers next
+		next = current->next;
+
+		// reversal of the current node's pointer
+		current->next = previous;
+
+		// shifts pointers one position in front.
+		previous = current;
+		current = next;
+	}
+	*initialpointer_ref = previous;
+}
+
+/* Function to push a node */
+void push(struct nodes** initialpointer_ref, int new_data)
+{
+	struct nodes* new_node
+		= (struct nodes*)malloc(sizeof(struct nodes));
+	new_node->data = new_data;
+	new_node->next = (*initialpointer_ref);
+	(*initialpointer_ref) = new_node;
+}
+
+/* used to print linkedlist */
+void printList(struct nodes* initialpointer)
+{
+	struct nodes* temporary = initialpointer;
+	while (temporary != NULL) {
+		printf("%d ", temporary->data);
+		temporary = temporary->next;
+	}
+}
+
+/* Driver code*/
+int main()
+{
+	/* Start with the empty list */
+	struct nodes* initialpointer = NULL;
+
+	push(&initialpointer, 34);
+	push(&initialpointer, 14);
+	push(&initialpointer, 25);
+	push(&initialpointer, 55);
+
+	printf("Original linked list\n");
+	printList(initialpointer);
+	reversal(&initialpointer);
+	printf("\n After reversal of linked list \n");
+	printList(initialpointer);
+	getchar();
+}
