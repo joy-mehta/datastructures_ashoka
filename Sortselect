@@ -1,0 +1,58 @@
+// Online C compiler to run C program online
+#include <stdio.h>
+void exchange(int *p, int *q)
+{
+    int t = *p;
+    *p = *q;
+    *q = t;
+}
+ 
+void Sortselect(int k[], int n)
+{
+    int min;
+ 
+    // Shift boundary of the subarray that has not been sorted, one at a time 
+    for (int m = 0; m < n-1; m++)
+    {
+        // Within the unsorted array, look for the element with the minimum value
+        min = m;
+        for (int j = m+1; j < n; j++)
+        {
+          if (k[j] < k[min])
+            min = j;
+        }
+        // Exchange the found minimum element with the first element
+           if(min != m)
+            exchange(&k[min], &k[m]);
+    }
+}
+ 
+/* Printing an array */
+void printArray(int k[], int length)
+{
+    for (int m=0; m < length; m++)
+    {
+        printf("%d ", k[m]);
+    }
+    printf("\n");
+}
+
+// Driver program to test above functions
+int main()
+{
+    int l;
+    printf("State the length of the array");
+    scanf("%d", &l);
+    int k[l];
+    printf("Put in the elements into the array");
+    for(int m = 0; m < l; m++)
+    {
+        scanf("%d", &k[m]);
+    }
+    printf("Input array is:");
+    printArray(k, l);
+    Sortselect(k, l);
+    printf("Sorted array: \n");
+    printArray(k, l);
+    return 0;
+}
