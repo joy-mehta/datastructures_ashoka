@@ -65,7 +65,7 @@ struct nodes* last_node(struct nodes* initialpointer)
 
 // the given last node's position is being set to its proper
 // position
-struct nodes* parition(struct nodes* first, struct nodes* last)
+struct nodes* partition(struct nodes* first, struct nodes* last)
 {
 	// Get first node of given linked list
 	struct nodes* pivot = first;
@@ -101,7 +101,7 @@ void qs(struct nodes* first, struct nodes* last)
 	if (first == last) {
 		return;
 	}
-	struct nodes* pivot = parition(first, last);
+	struct nodes* pivot = partition(first, last);
 
 	if (pivot != NULL && pivot->next != NULL) {
 		qs(pivot->next, last);
