@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
+
+/* nodes structure*/
+struct nodes {
+    int data;          // Data 
+    struct nodes *next; // Address 
+}*headpointer;
+
+
+/* 
+ *  creating and displaying list
+ */
+void Listcreation(int k);
+
+int main()
+{
+    int k;
+
+    printf("Mention the total number of nodes: ");
+    scanf("%d", &k);
+
+    Listcreation(k);
+
+    
+    
+    return 0;
+}
+
+/*
+ * Form a k nodes list
+ */
+void Listcreation(int k)
+{
+    struct nodes *node2, *temporary;
+    int data, t;
+
+    headpointer = (struct nodes *)malloc(sizeof(struct nodes));
+
+    // End operation if memory is not allocated
+    if(headpointer == NULL)
+    {
+        printf("memory not allocated.");
+        exit(0);
+    }
+
+
+    // User puts in the data of nodes
+    printf("Write the data of nodes 1: ");
+    scanf("%d", &data);
+
+    headpointer->data = data; //  data field is linked with data
+    headpointer->next = NULL; //  address field is linked to NULL
+
+
+    // Form k - 1 nodes first and then insert it to list
+    temporary = headpointer;
+    for(t=2; t<=k; t++)
+    {
+        node2 = (struct nodes *)malloc(sizeof(struct nodes));
+
+        /* If memory is not allocated for node2 */
+        if(node2 == NULL)
+        {
+            printf("memory not allocated.");
+            break;
+        }
+
+        printf("Write the data of nodes %d: ", t);
+        scanf("%d", &data);
+
+        node2->data = data; // Link data field of node2
+        node2->next = NULL; // Make sure new nodes points to NULL 
+
+        temporary->next = node2; // Link previous nodes with node2
+        temporary = temporary->next;    // Make current nodes as previous nodes
+    }
+    printf("\nData in the list ");
+    struct nodes *f = headpointer;
+	while (f != NULL) {
+		printf("%d ", f->data);
+		f = f->next;
+	}
+
+}
