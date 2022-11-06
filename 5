@@ -1,0 +1,139 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// structure creation
+struct nodes {
+	int data;
+	struct nodes* next;
+};
+
+
+void insert(struct nodes** initialpointer, int value)
+// this adds a new node at the end of the linkedlist
+{
+	// "changing node" creation
+	struct nodes* node
+		= (struct nodes*)malloc(sizeof(struct nodes));
+	if (node == NULL) {
+		// memory storage check
+		printf("Memory has overflown\n");
+	}
+	else {
+		node->data = value;
+		node->next = NULL;
+		if (*initialpointer == NULL) {
+			*initialpointer = node;
+		}
+		else {
+			struct nodes* temporary = *initialpointer;
+
+			// used to find the last node
+			while (temporary->next != NULL) {
+				temporary = temporary->next;
+			}
+
+			// used to add node at the last position
+			temporary->next = node;
+		}
+	}
+}
+
+// linkedlist elements are shown
+void display(struct nodes* initialpointer)
+{
+	if (initialpointer == NULL) {
+		printf("linked list is empty (has 0 elements");
+		return;
+	}
+	struct nodes* temporary = initialpointer;
+	printf("\n Linked List :");
+	while (temporary != NULL) {
+		printf(" %d", temporary->data);
+		temporary = temporary->next;
+	}
+}
+
+// linked list's last element is being found
+struct nodes* last_node(struct nodes* initialpointer)
+{
+	struct nodes* temporary = initialpointer;
+	while (temporary != NULL && temporary->next != NULL) {
+		temporary = temporary->next;
+	}
+	return temporary;
+}
+
+// the given last node's position is being set to its proper
+// position
+struct nodes* parition(struct nodes* first, struct nodes* last)
+{
+	// Get first node of given linked list
+	struct nodes* pivot = first;
+	struct nodes* front = first;
+	int temporary = 0;
+	while (front != NULL && front != last) {
+		if (front->data < last->data) {
+			pivot = first;
+
+			//  node values are exchanged
+			temporary = first->data;
+			first->data = front->data;
+			front->data = temporary;
+
+			// going to the next node
+			first = first->next;
+		}
+
+		// going to the next node
+		front = front->next;
+	}
+
+	// modify last node's value to current node
+	temporary = first->data;
+	first->data = last->data;
+	last->data = temporary;
+	return pivot;
+}
+
+// do quick sort in the given linked list, qs= quicksort function
+void qs(struct nodes* first, struct nodes* last)
+{
+	if (first == last) {
+		return;
+	}
+	struct nodes* pivot = parition(first, last);
+
+	if (pivot != NULL && pivot->next != NULL) {
+		qs(pivot->next, last);
+	}
+
+	if (pivot != NULL && first != pivot) {
+		qs(first, pivot);
+	}
+}
+
+// Driver's code
+int main()
+{
+	struct nodes* initialpointer = NULL;
+
+	// Create linked list
+	insert(&initialpointer, 11);
+	insert(&initialpointer, 52);
+	insert(&initialpointer, 70);
+	insert(&initialpointer, 22);
+	insert(&initialpointer, 25);
+	insert(&initialpointer, 36);
+	insert(&initialpointer, 94);
+	insert(&initialpointer, 18);
+	insert(&initialpointer, 8);
+	insert(&initialpointer, 41);
+	printf("\n Unsorted List ");
+	display(initialpointer);
+
+	// Function call
+	qs(initialpointer, last_node(initialpointer));
+	printf("\n  Sorted List ");
+	display(initialpointer);
+	return 0;
+}
