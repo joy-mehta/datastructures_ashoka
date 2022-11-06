@@ -1,0 +1,51 @@
+void insert(int x[], int n)
+{
+    int position, k;
+    for (int j = 1; j < n; j++) {
+        position = x
+    [j];
+        k = j-1;
+        while (k>= 0 && x
+    [k] > position)
+        {
+            x
+        [k + 1] = x
+        [k];
+            k=k-1;
+        }
+        x
+    [k+1] = position;
+    }
+}
+
+void printing(int x[], int n)
+{
+    int j;
+    for (j = 0; j < n; j++)
+        printf("%d ", x
+    [j]);
+    printf("\n");
+}
+
+int main()
+{
+    int l;
+    printf("State length of array\n");
+    scanf("%d", &l);
+    int x[l];
+    printf("Write elements into the array\n");
+    for(int j = 0; j < l; j++)
+    {
+        scanf("%d", &x
+    [j]);
+    }
+    printf("Input array is:\n");
+    printing(x
+, l);
+    insert(x
+, l);
+    printf("Sorted array: \n");
+    printing(x
+, l);
+    return 0;
+}
