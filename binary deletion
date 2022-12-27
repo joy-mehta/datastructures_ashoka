@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct N {
+  int data;
+  struct N *L;
+  struct N *R;
+};
+//N stands for Node
+struct N *node_creation(int data) {
+  struct N *newnode = (struct N *)malloc(sizeof(struct N));
+  newnode->data = data;
+  newnode->L = NULL;
+  newnode->R = NULL;
+  return newnode;
+}
+//L stands for left
+//R stands for right
+struct N *Minimum_node_finding(struct N *root) {
+  while (root->L != NULL) {
+    root = root->L;
+  }
+  return root;
+}
+
+struct N *node_deletion(struct N *root, int data) {
+  if (root == NULL) return root;
+
+  if (data < root->data) {
+    root->L = node_deletion(root->L, data);
+  } else if (data > root->data) {
+    root->R = node_deletion(root->R, data);
+  } else {
+    if (root->L == NULL) {
+      struct N *TEMP = root->R;
+      free(root);
+      return TEMP;
+    } else if (root->R == NULL) {
+      struct N *TEMP = root->L;
+      free(root);
+      return TEMP;
+    }
+
+    struct N *TEMP = Minimum_node_finding(root->R);
+    root->data = TEMP->data;
+    root->R = node_deletion(root->R, TEMP->data);
+  }
+
+  return root;
+}
+
+void orderly(struct N* root) {
+    if (root == NULL) {
+        return;
+    }
+    orderly(root->L);
+    printf("%d \n", root->data);
+    orderly(root->R);
+}
+
+int main() {
+  struct N *root = node_creation(10);
+  root->L = node_creation(5);
+  root->R = node_creation(15);
+  root->L->L = node_creation(3);
+  root->L->R = node_creation(7);
+  root->R->L = node_creation(12);
+  root->R->R = node_creation(18);
+  printf("Initial tree:\n");
+  orderly(root);
+  root = node_deletion(root, 15);
+  printf("Deleted node\n");
+  orderly(root);
+  return 0;
+}
