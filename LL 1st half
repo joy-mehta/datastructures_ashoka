@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct N {
+  int data;
+  struct N* NEXT;
+};
+//N stands for node
+void push(struct N** top, int numbernew)
+{
+    int l= sizeof(struct N);
+    struct N* new = (struct N*)malloc(l);
+    new->data = numbernew;
+    new->NEXT = (*top);
+    (*top) = new;
+}
+
+void print_1sthalf(struct N* head) {
+  //a SLOW and a FAST pointer is chosen
+  struct N* SLOW = head;
+  struct N* FAST = head;
+
+  //Up until the FAST pointer reaches the end of the list, increase the FAST pointer by two nodes and the SLOW pointer by one nodes.
+
+  while (FAST != NULL && FAST->NEXT != NULL) {
+    SLOW = SLOW->NEXT;
+    FAST = FAST->NEXT->NEXT;
+  }
+  while (head != SLOW) {
+    printf("%d ", head->data);
+    head = head->NEXT;
+  }
+}
+
+int main(void) {
+  struct N* head = malloc(sizeof(struct N));
+  push(&head, 17);
+  push(&head, 53);
+  push(&head, 13);
+  push(&head, 2);
+  push(&head, 62);
+  push(&head, 73);
+  
+
+  //the linked list's first half will be printed
+  print_1sthalf(head);
+  return 0;
+}
