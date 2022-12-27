@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define L(p) (2*p + 1)
+#define R(p) (2*p + 2)
+#define parent(p) ((p-1)/2)
+
+//L stands for left
+//R stands for right
+
+typedef struct {
+  int size;
+  int capacity;
+  int *data;
+} HEAP;
+
+void swap(int *s, int *t) {
+  int temp = *s;
+  *s = *t;
+  *t = temp;
+}
+
+void HEAPIFY(HEAP *heap, int p) {
+  int small = p;
+  int L = L(p);
+  int R = R(p);
+
+  if (L < heap->size && heap->data[L] < heap->data[small]) {
+    small = L;
+  }
+
+  if (R < heap->size && heap->data[R] < heap->data[small]) {
+    small = R;
+  }
+
+  if (small != p) {
+    swap(&heap->data[p], &heap->data[small]);
+    HEAPIFY(heap, small);
+  }
+}
+
+HEAP *heapcreation(int capacity) {
+  HEAP *heap = malloc(sizeof(HEAP));
+  heap->size = 0;
+  heap->capacity = capacity;
+  heap->data = malloc(capacity * sizeof(int));
+  return heap;
+}
+
+void add(HEAP *heap, int value) {
+  if (heap->size == heap->capacity) {
+    printf("Error: heap is filled to capacity\n");
+    return;
+  }
+
+  heap->data[heap->size] = value;
+  int p = heap->size;
+  heap->size++;
+
+  while (p != 0 && heap->data[parent(p)] > heap->data[p]) {
+    swap(&heap->data[p], &heap->data[parent(p)]);
+    p = parent(p);
+  }
+}
+
+int minimumextract(HEAP *heap) {
+  if (heap->size == 0) {
+    printf("Error: heap is not filled to capacity. Thus, heap is empty\n");
+    return -1;
+  }
+
+  int min = heap->data[0];
+  heap->data[0] = heap->data[heap->size - 1];
+  heap->size--;
+  HEAPIFY(heap, 0);
+  return min;
+}
+
+int main() {
+  HEAP *heap = heapcreation(10);
+
+  add(heap, 31);
+  add(heap, 12);
+  add(heap, 1);
+  add(heap, 52);
+  add(heap, 5);
+  add(heap, 49);
+  add(heap, 34);
+  
+  for(int p = 0; p<10; p++)
+  {
+      int x = minimumextract(heap);
+      if (x==-1)
+      break;
+      printf(" min extracted: %d\n", x);
+  }
+  return 0;
+}
