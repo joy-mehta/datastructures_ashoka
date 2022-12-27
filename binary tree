@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct N {
+  int data;
+  struct N* L;
+  struct N* R;
+};
+//N stands for Node
+struct N* node_creation(int data) {
+  struct N* N = (struct N*)malloc(sizeof(struct N));
+  N->data = data;
+  N->L = NULL;
+  N->R = NULL;
+  return N;
+}
+//L stands for left
+//R stands for right
+struct N* add(struct N* ROOT, int data) {
+    if (ROOT == NULL) {
+        return node_creation(data);
+    }
+    if (data < ROOT->data) {
+        ROOT->L = add(ROOT->L, data);
+    }
+    else if (data > ROOT->data) {
+        ROOT->R = add(ROOT->R, data);
+    }
+    return ROOT;
+}
+
+void orderly(struct N* ROOT) {
+    if (ROOT == NULL) {
+        return;
+    }
+    orderly(ROOT->L);
+    printf("%d ", ROOT->data);
+    orderly(ROOT->R);
+}
+
+int main() {
+    struct N* ROOT = NULL;
+    ROOT = add(ROOT, 45);
+    add(ROOT, 32);
+    add(ROOT, 21);
+    add(ROOT, 4);
+    add(ROOT, 17);
+    add(ROOT, 68);
+    add(ROOT, 53);
+
+    orderly(ROOT);
+    return 0;
+}
