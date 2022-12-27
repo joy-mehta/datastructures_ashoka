@@ -1,0 +1,166 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+// Max number of levels for a node in a skip list
+#define level_max 9
+
+// / Prob of adding a new level to a skip list N
+#define prob 0.5
+ 
+// N in a Skip list 
+typedef struct N {
+  int key;
+  int value;
+  struct N **next;
+} N;
+
+// N means node 
+
+// Skip list
+typedef struct SkipL {
+  int level;
+  struct N *head;
+} SkipL;
+
+//a new skip list node is created with the supplied key, value, 
+//and a Randomised number of levels (up to level max).
+N *nodecreation(int key, int value) {
+  N *n = malloc(sizeof(N));
+  n->key = key;
+  n->value = value;
+  n->next = malloc((level_max + 1) * sizeof(N*));
+  for (int i = 0; i <= level_max; i++) {
+    n->next[i] = NULL;
+  }
+  return n;
+}
+
+// a new skip list is created
+SkipL *skiplistcreation() {
+  SkipL *list = malloc(sizeof(SkipL));
+  list->level = 0;
+  list->head = nodecreation(0, 0);
+  return list;
+}
+
+//builds a Random level for a new skip list node based on the prob constant.
+int level_random() {
+  int level = 0;
+  while (rand() < prob * RAND_MAX && level < level_max) {
+    level++;
+  }
+  return level;
+}
+
+// adds a new key-value pair into the skip list
+void add(SkipL *list, int key, int value) {
+  N *update[level_max + 1];
+  N *n = list->head;
+
+  // Find the position to add the new N
+  for (int i = list->level; i >= 0; i--) {
+    while (n->next[i] != NULL && n->next[i]->key < key) {
+      n = n->next[i];
+    }
+    update[i] = n;
+  }
+  n = n->next[0];
+
+  // update value if key already exists
+  if (n != NULL && n->key == key) {
+    n->value = value;
+    return;
+  }
+
+  // generate a random level for the new node
+  int level = level_random();
+
+  //update the head node if the new node has higher level than current highest level
+  if (level > list->level) {
+    for (int i = list->level + 1; i <= level; i++) {
+      update[i] = list->head;
+      }
+    list->level = level;
+    }
+
+    // this creates a new node and updates the skip list
+    n = nodecreation(key, value);
+    for (int i = 0; i <= level; i++) {
+        n->next[i] = update[i]->next[i];
+        update[i]->next[i] = n;
+    }
+}
+//returns the corresponding value after looking for a key in the skip list.
+int search(SkipL *list, int key) {
+    N *n = list->head;
+    for (int i = list->level; i >= 0; i--) {
+        while (n->next[i] != NULL && n->next[i]->key < key) {
+            n = n->next[i];
+        }
+    }
+    n = n->next[0];
+    if (n != NULL && n->key == key) {
+        return n->value;
+    }
+    return 0;
+}
+
+// deletes a key from the skip list
+void delete_key(SkipL *list, int key) {
+    N *update[level_max + 1];
+    N *n = list->head;
+
+    // Find the location of the key that has to be deleted.
+    for (int i = list->level; i >= 0; i--) {
+        while (n->next[i] != NULL && n->next[i]->key < key) {
+            n = n->next[i];
+        }
+        update[i] = n;
+    }
+    n = n->next[0];
+
+    // do nothing if the key is not located
+    if (n == NULL || n->key != key) {
+        return;
+    }
+
+    // Update the skip list to remove the key.
+    for (int i = 0; i <= list->level; i++) {
+        if (update[i]->next[i] != n) {
+        break;
+        }
+    update[i]->next[i] = n->next[i];
+    }
+    free(n);
+
+    // If required, lower the level of the skip list.
+    while (list->level > 0 && list->head->next[list->level] == NULL) {
+        list->level--;
+    }
+}
+
+int main() {
+    srand(time(NULL)); // Seed the RNG
+
+    SkipL *list = skiplistcreation();
+
+    // include some additional key-value pairs in the skip list.
+    add(list, 1, 13);
+    add(list, 2, 2);
+    add(list, 3, 36);
+    add(list, 4, 23);
+    add(list, 5, 80);
+
+    // look for a key in the skip list
+    printf("Key number 4 value: %d\n", search(list,4));
+
+    // delete a key from the skip list
+    delete_key(list, 4);
+
+    // look for the deleted key
+    printf("Deleted key number 4 value: %d\n", search(list, 4));
+
+    return 0;
+}
