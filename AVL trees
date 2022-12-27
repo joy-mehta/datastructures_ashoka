@@ -1,0 +1,235 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+typedef struct avl {
+  int data;
+  int HEIGHT;
+  struct avl* L;
+  struct avl* R;
+} avl;
+
+int HEIGHT(avl* nodes) {
+  if (nodes == NULL) {
+    return 0;
+  }
+  return nodes->HEIGHT;
+}
+
+int factorbalancing(avl* nodes) {
+  if (nodes == NULL) {
+    return 0;
+  }
+  return HEIGHT(nodes->L) - HEIGHT(nodes->R);
+}
+
+//this is used to rotate AVL nodes in rightward direction
+avl* R_rotate(avl* nodes) {
+  avl* child_L = nodes->L;
+  avl* child_R = child_L->R;
+
+  child_L->R = nodes;
+  nodes->L = child_R;
+
+  nodes->HEIGHT = 1 + fmax(HEIGHT(nodes->L), HEIGHT(nodes->R));
+  child_L->HEIGHT = 1 + fmax(HEIGHT(child_L->L), HEIGHT(child_L->R));
+
+  return child_L;
+}
+
+//this is used to rotate AVL nodes in leftward direction  
+avl* L_rotate(avl* nodes) {
+  avl* child_R = nodes->R;
+  avl* child_L = child_R->L;
+
+  child_R->L = nodes;
+  nodes->R = child_L;
+
+  nodes->HEIGHT = 1 + fmax(HEIGHT(nodes->L), HEIGHT(nodes->R));
+  child_R->HEIGHT = 1 + fmax(HEIGHT(child_R->L), HEIGHT(child_R->R));
+
+  return child_R;
+}
+
+//when you have to add a new value into the AVL tree, this is used
+avl* add(avl* ROOT, int data) {
+  if (ROOT == NULL) {
+    ROOT = (avl*)malloc(sizeof(avl));
+    ROOT->data = data;
+    ROOT->HEIGHT = 1;
+    ROOT->L = NULL;
+    ROOT->R = NULL;
+    return ROOT;
+  }
+  else if (data < ROOT->data) {
+    ROOT->L = add(ROOT->L, data);
+  }
+  else {
+    ROOT->R = add(ROOT->R, data);
+  }
+    ROOT->HEIGHT = 1 + fmax(HEIGHT(ROOT->L), HEIGHT(ROOT->R));
+
+    int BALANCE = factorbalancing(ROOT);
+
+    //it is a L-heavy tree, if balance factor>1
+    if (BALANCE > 1) {
+       
+        if (factorbalancing(ROOT->L) > 0) {
+            return R_rotate(ROOT);
+        }
+         //do a R rotation on ROOT if child_L is L heavy
+        else {
+            ROOT->L = L_rotate(ROOT->L);
+            return R_rotate(ROOT);
+        }
+    }
+            //do a L-R rotation if child_L is R heavy
+
+    //it is a R-heavy tree if factorbalancing<-1
+    else if (BALANCE < -1) {
+    // do a L rotation on ROOT if child_R is R heavy
+        if (factorbalancing(ROOT->R) < 0) {
+            return L_rotate(ROOT);
+        }
+        //do a R-L rotation if child_R is L heavy
+        else {
+            ROOT->R = R_rotate(ROOT->R);
+            return L_rotate(ROOT);
+        }
+    }
+    //return the ROOT unchanged if tree is balanced
+    return ROOT;
+}
+
+// how to locate a value in the AVL tree
+avl* locate(avl* ROOT, int data) {
+    if (ROOT == NULL || ROOT->data == data) {
+        return ROOT;
+    }
+    //locate the L subtree if the required value is less than the current node
+    
+    else if (data < ROOT->data) {
+        return locate(ROOT->L, data);
+    }
+    //locate the R subtree if the required value is greater than the current nodes
+    else {
+        return locate(ROOT->R, data);
+    }
+}
+
+//To delete (erase/delete) a value from the AVL tree
+avl* delete(avl* ROOT, int data) {
+    if (ROOT == NULL) {
+        return ROOT;
+    }
+    else if (data < ROOT->data) {
+        ROOT->L = delete(ROOT->L, data);
+    }
+    else if (data > ROOT->data) {
+        ROOT->R = delete(ROOT->R, data);
+    }
+    else {
+        if (ROOT->L == NULL || ROOT->R == NULL) {
+            avl* temp = ROOT->L ? ROOT->L : ROOT->R;
+            if (temp == NULL) {
+                temp = ROOT;
+                ROOT = NULL;
+            }
+            else {
+                *ROOT = *temp;
+            }
+            free(temp);
+        }
+        // locate the inorder successor and replace it with the nodes, if the nodes have two children
+        // 
+        else {
+            avl *temp = ROOT->R;
+                while (temp->L != NULL) {
+                    temp = temp->L;
+                }
+            ROOT->data = temp->data;
+            ROOT->R = delete(ROOT->R, temp->data);
+        }
+    }
+    if (ROOT == NULL) {
+        return ROOT;
+    }
+
+    ROOT->HEIGHT = 1 + fmax(HEIGHT(ROOT->L), HEIGHT(ROOT->R));
+    int BALANCE = factorbalancing(ROOT);
+
+    // tree is L-heavy if factorbalancing>1
+    if (BALANCE > 1) {
+        //do a R rotation on root if child_L is L heavy
+        if (factorbalancing(ROOT->L) > 0) {
+            return R_rotate(ROOT);
+        }
+        
+        //do a L-R rotation on root if child_L is R heavy
+        else {
+            ROOT->L = L_rotate(ROOT->L);
+            return R_rotate(ROOT);
+        }
+    }
+    // tree is R-heavy if factorbalancing<-1
+
+    else if (BALANCE < -1) {
+        //do a L rotation on root if child_R is R heavy
+
+        if (factorbalancing(ROOT->R) < 0) {
+            return L_rotate(ROOT);
+        }
+        //do a R-L rotation on root if child_R is L heavy
+
+        else {
+            ROOT->R = R_rotate(ROOT->R);
+            return L_rotate(ROOT);
+        }
+    }
+
+    //return the ROOT unchanged if tree is balanced
+    return ROOT;
+}
+
+//Go through the AVL tree INORDER and print the values
+void INORDER(avl* ROOT) {
+    if (ROOT != NULL) {
+        INORDER(ROOT->L);
+        printf("%d ", ROOT->data);
+        INORDER(ROOT->R);
+    }
+}
+
+int main() {
+    avl* ROOT = NULL;
+
+    ROOT = add(ROOT, 1);
+    ROOT = add(ROOT, 2);
+    ROOT = add(ROOT, 3);
+    ROOT = add(ROOT, 4);
+    ROOT = add(ROOT, 5);
+    ROOT = add(ROOT, 6);
+
+    //Print out the inorder traversal of the tree
+    printf("Orderly traversal: ");
+    INORDER(ROOT);
+    printf("\n");
+
+    //locating for a value in the tree
+    avl* result = locate(ROOT, 3);
+    if (result != NULL) {
+        printf("Located value: %d\n", result->data);
+    }
+    else {
+        printf("Value not located\n");
+    }
+
+    //removing a value from the tree
+    ROOT = delete(ROOT, 3);
+    printf("Orderly traversal post removal: ");
+    INORDER(ROOT);
+    printf("\n");
+
+    return 0;
+}
+
